@@ -56,7 +56,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\Dict.cs" />
     <Compile Include="Configuration\CustomComboPreset.cs" />
     <Compile Include="IconReplacer.cs" />
     <Compile Include="IconReplacerAddressResolver.cs" />

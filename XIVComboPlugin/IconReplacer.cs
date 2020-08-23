@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Dalamud.Game.ClientState.Structs;
 using XIVComboPlugin.JobCombos;
 using Dalamud.Plugin;
-using XIVComboPlugin.Configuration;
 
 namespace XIVComboPlugin
 {
