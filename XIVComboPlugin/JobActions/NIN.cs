@@ -3,6 +3,7 @@
     public static class NIN
     {
         public const uint
+            ClassId = 30,
             ArmorCrush = 3563,
             SpinningEdge = 2240,
             GustSlash = 2242,

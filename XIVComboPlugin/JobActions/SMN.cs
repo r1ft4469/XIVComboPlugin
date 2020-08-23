@@ -3,6 +3,7 @@
     public static class SMN
     {
         public const uint
+            ClassId = 27,
             Deathflare = 3582,
             EnkindlePhoenix = 16516,
             EnkindleBahamut = 7429,

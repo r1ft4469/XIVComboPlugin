@@ -3,6 +3,7 @@
     public static class AST
     {
         public const uint
+            ClassId = 33,
             Play = 17055,
             Draw = 3590,
             Balance = 4401,

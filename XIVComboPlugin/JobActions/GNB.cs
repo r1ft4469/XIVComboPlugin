@@ -3,6 +3,7 @@
     public static class GNB
     {
         public const uint
+            ClassId = 37,
             SolidBarrel = 16145,
             KeenEdge = 16137,
             BrutalShell = 16139,

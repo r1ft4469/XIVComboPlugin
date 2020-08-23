@@ -3,6 +3,7 @@
     public static class MCH
     {
         public const uint
+            ClassId = 31,
             CleanShot = 2873,
             HeatedCleanShot = 7413,
             SplitShot = 2866,

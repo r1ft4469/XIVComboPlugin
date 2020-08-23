@@ -3,6 +3,7 @@
     public static class PLD
     {
         public const uint
+            ClassId = 19,
             GoringBlade = 3538,
             FastBlade = 9,
             RiotBlade = 15,

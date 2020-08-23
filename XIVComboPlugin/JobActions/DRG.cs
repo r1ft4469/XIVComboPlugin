@@ -3,6 +3,7 @@
     public static class DRG
     {
         public const uint
+            ClassId = 22,
             Jump = 92,
             HighJump = 16478,
             MirageDive = 7399,
@@ -18,6 +19,7 @@
             FangAndClaw = 3554,
             WheelingThrust = 3556,
             FullThrust = 84,
-            VorpalThrust = 78;
+            VorpalThrust = 78,
+            ClassID = 22;
     }
 }

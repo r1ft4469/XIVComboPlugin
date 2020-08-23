@@ -3,6 +3,7 @@
     public static class DRK
     {
         public const uint
+            ClassId = 32,
             Souleater = 3632,
             HardSlash = 3617,
             SyphonStrike = 3623,

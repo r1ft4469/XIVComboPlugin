@@ -56,11 +56,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\Dict.cs" />
     <Compile Include="Configuration\CustomComboPreset.cs" />
     <Compile Include="IconReplacer.cs" />
     <Compile Include="IconReplacerAddressResolver.cs" />
     <Compile Include="Configuration\XIVComboConfiguration.cs" />
     <Compile Include="JobActions\MNK.cs" />
+    <Compile Include="JobCombos\ASTcombo.cs" />
+    <Compile Include="JobCombos\BLMcombo.cs" />
+    <Compile Include="JobCombos\BRDcombo.cs" />
+    <Compile Include="JobCombos\DNCcombo.cs" />
+    <Compile Include="JobCombos\DRGcombo.cs" />
+    <Compile Include="JobCombos\DRKcombo.cs" />
+    <Compile Include="JobCombos\GNBcombo.cs" />
+    <Compile Include="JobCombos\MCHcombo.cs" />
+    <Compile Include="JobCombos\MNKcombo.cs" />
+    <Compile Include="JobCombos\NINcombo.cs" />
+    <Compile Include="JobCombos\PLDcombo.cs" />
+    <Compile Include="JobCombos\RDMcombo.cs" />
+    <Compile Include="JobCombos\SAMcombo.cs" />
+    <Compile Include="JobCombos\SCHcombo.cs" />
+    <Compile Include="JobCombos\SMNcombo.cs" />
+    <Compile Include="JobCombos\WARcombo.cs" />
+    <Compile Include="JobCombos\WHMcombo.cs" />
     <Compile Include="XIVComboPlugin.cs" />
     <Compile Include="JobActions\AST.cs" />
     <Compile Include="JobActions\BLM.cs" />
@@ -85,7 +103,7 @@
       <Version>11.0.2</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
-      <Version>2.6.0</Version>
+      <Version>2.10.0-dev-01240</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Sinks.Async">
       <Version>1.1.0</Version>

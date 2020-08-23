@@ -3,6 +3,7 @@
     public static class WAR
     {
         public const uint
+            ClassId = 21,
             StormsPath = 42,
             HeavySwing = 31,
             Maim = 37,

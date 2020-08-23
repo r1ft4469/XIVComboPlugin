@@ -3,6 +3,7 @@
     public static class BRD
     {
         public const uint
+            ClassId = 23,
             WanderersMinuet = 3559,
             PitchPerfect = 7404,
             HeavyShot = 97,

@@ -3,6 +3,7 @@
     public static class DNC
     {
         public const uint
+            ClassId = 38,
             Bladeshower = 15994,
             Bloodshower = 15996,
             Windmill = 15993,

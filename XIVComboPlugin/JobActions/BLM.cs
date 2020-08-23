@@ -3,6 +3,7 @@
     public static class BLM
     {
         public const uint
+            ClassId = 25,
             Enochian = 3575,
             Blizzard4 = 3576,
             Fire4 = 3577,
