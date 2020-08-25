@@ -180,6 +180,9 @@ namespace XIVComboPlugin
             var comboTime = Marshal.PtrToStructure<float>(comboTimer);
             //var level = Marshal.ReadByte(playerLevel);
             var level = clientState.LocalPlayer.Level;
+
+
+
             // DRAGOON
 
             // Change Jump/High Jump into Mirage Dive when Dive Ready
@@ -396,74 +399,80 @@ namespace XIVComboPlugin
                 }
 
             // SAMURAI
-
-            // Replace Yukikaze with Yukikaze combo
-            if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiYukikazeCombo))
-                if (actionID == SAM.Yukikaze)
-                {
-                    SAMcombo combo = new SAMcombo();
-                    foreach (uint a in combo.Single_Combo(clientState, comboTime, lastMove, level))
+            if (job == 34)
+            {
+                // Replace Yukikaze with Yukikaze combo
+                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiYukikazeCombo))
+                    if (actionID == SAM.Yukikaze)
                     {
-                        if (a != 0)
-                            return a;
+                        SAMcombo combo = new SAMcombo();
+                        foreach (uint a in combo.Single_Combo(clientState, comboTime, lastMove, level))
+                        {
+                            if (a != 0)
+                                return a;
+                        }
                     }
-                }
 
-            // Replace Gekko with Gekko combo
-            if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiGekkoCombo))
-                if (actionID == SAM.Gekko)
-                {
-                    SAMcombo combo = new SAMcombo();
-                    foreach (uint a in combo.Gekko_Combo(clientState, comboTime, lastMove, level))
+                // Replace Gekko with Gekko combo
+                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiGekkoCombo))
+                    if (actionID == SAM.Gekko)
                     {
-                        if (a != 0)
-                            return a;
+                        SAMcombo combo = new SAMcombo();
+                        foreach (uint a in combo.Gekko_Combo(clientState, comboTime, lastMove, level))
+                        {
+                            if (a != 0)
+                                return a;
+                        }
                     }
-                }
 
-            // Replace Kasha with Kasha combo
-            if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiKashaCombo))
-                if (actionID == SAM.Kasha)
-                {
-                    SAMcombo combo = new SAMcombo();
-                    foreach (uint a in combo.Kasha_Combo(clientState, comboTime, lastMove, level))
+                // Replace Kasha with Kasha combo
+                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiKashaCombo))
+                    if (actionID == SAM.Kasha)
                     {
-                        if (a != 0)
-                            return a;
+                        SAMcombo combo = new SAMcombo();
+                        foreach (uint a in combo.Kasha_Combo(clientState, comboTime, lastMove, level))
+                        {
+                            if (a != 0)
+                                return a;
+                        }
                     }
-                }
 
-            // Replace Mangetsu with Mangetsu combo
-            if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiMangetsuCombo))
-                if (actionID == SAM.Mangetsu)
-                {
-                    SAMcombo combo = new SAMcombo();
-                    foreach (uint a in combo.Aoe_Combo(clientState, comboTime, lastMove, level))
+                // Replace Mangetsu with Mangetsu combo
+                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiMangetsuCombo))
+                    if (actionID == SAM.Mangetsu)
                     {
-                        if (a != 0)
-                            return a;
+                        SAMcombo combo = new SAMcombo();
+                        foreach (uint a in combo.Aoe_Combo(clientState, comboTime, lastMove, level))
+                        {
+                            if (a != 0)
+                                return a;
+                        }
                     }
-                }
 
-            // Replace Oka with Oka combo
-            if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiOkaCombo))
-                if (actionID == SAM.Oka)
-                {
-                    SAMcombo combo = new SAMcombo();
-                    foreach (uint a in combo.Oka_Combo(clientState, comboTime, lastMove, level))
+                // Replace Oka with Oka combo
+                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiOkaCombo))
+                    if (actionID == SAM.Oka)
                     {
-                        if (a != 0)
-                            return a;
+                        SAMcombo combo = new SAMcombo();
+                        foreach (uint a in combo.Oka_Combo(clientState, comboTime, lastMove, level))
+                        {
+                            if (a != 0)
+                                return a;
+                        }
                     }
-                }
 
-            // Turn Seigan into Third Eye when not procced
-            if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiThirdEyeFeature))
-                if (actionID == SAM.Seigan) {
-                    UpdateBuffAddress();
-                    if (SearchBuffArray(1252)) return SAM.Seigan;
-                    return SAM.ThirdEye;
-                }
+                // Turn Seigan into Third Eye when not procced
+                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiThirdEyeFeature))
+                    if (actionID == SAM.Seigan)
+                    {
+                        SAMcombo combo = new SAMcombo();
+                        foreach (uint a in combo.Seigan_Combo(clientState, comboTime, lastMove, level))
+                        {
+                            if (a != 0)
+                                return a;
+                        }
+                    }
+            }
 
             // NINJA
 
@@ -1048,257 +1057,17 @@ namespace XIVComboPlugin
 
         private void PopulateDict()
         {
-            customIds.Add(8831);
-            customIds.Add(7867);
-            customIds.Add(7490);
-            customIds.Add(7491);
-            customIds.Add(7494);
-            customIds.Add(16477);
-            customIds.Add(88);
-            customIds.Add(84);
-            customIds.Add(3632);
-            customIds.Add(16468);
-            customIds.Add(3538);
-            customIds.Add(3539);
-            customIds.Add(16457);
-            customIds.Add(42);
-            customIds.Add(45);
-            customIds.Add(16462);
-            customIds.Add(7480);
-            customIds.Add(7481);
-            customIds.Add(7482);
-            customIds.Add(7484);
-            customIds.Add(7485);
-            customIds.Add(3563);
-            customIds.Add(2255);
-            customIds.Add(16488);
-            customIds.Add(16145);
-            customIds.Add(16150);
-            customIds.Add(16149);
-            customIds.Add(7413);
-            customIds.Add(2870);
-            customIds.Add(3575);
-            customIds.Add(149);
-            customIds.Add(17055);
-            customIds.Add(3582);
-            customIds.Add(3581);
-            customIds.Add(163);
-            customIds.Add(181);
-            customIds.Add(3578);
-            customIds.Add(16543);
-            customIds.Add(167);
-            customIds.Add(15994);
-            customIds.Add(15993);
-            customIds.Add(16007);
-            customIds.Add(16008);
-            customIds.Add(16531);
-            customIds.Add(16534);
-            customIds.Add(3559);
-            customIds.Add(97);
-            customIds.Add(16525);
-            customIds.Add(16524);
-            customIds.Add(7516);
-            customIds.Add(3566);
-            customIds.Add(92);
-            customIds.Add(3553);
-            customIds.Add(2873);
-            customIds.Add(3579);
-            customIds.Add(17209);
-            customIds.Add(7501);
-            customIds.Add(21);
-            customIds.Add(DNC.Bloodshower);
-            customIds.Add(DNC.RisingWindmill);
-            customIds.Add(RDM.Verstone);
-            customIds.Add(RDM.Verfire);
-            customIds.Add(MNK.Rockbreaker);
-            customIds.Add(BLM.LeyLines);
-            customIds.Add(PLD.Requiescat);
-            vanillaIds.Add(0x3e75);
-            vanillaIds.Add(0x3e76);
-            vanillaIds.Add(0x3e77);
-            vanillaIds.Add(0x3e78);
-            vanillaIds.Add(0x3e7d);
-            vanillaIds.Add(0x3e7e);
-            vanillaIds.Add(0x3e86);
-            vanillaIds.Add(0x3f10);
-            vanillaIds.Add(0x3f25);
-            vanillaIds.Add(0x3f1b);
-            vanillaIds.Add(0x3f1c);
-            vanillaIds.Add(0x3f1d);
-            vanillaIds.Add(0x3f1e);
-            vanillaIds.Add(0x451f);
-            vanillaIds.Add(0x42ff);
-            vanillaIds.Add(0x4300);
-            vanillaIds.Add(0x49d4);
-            vanillaIds.Add(0x49d5);
-            vanillaIds.Add(0x49e9);
-            vanillaIds.Add(0x49ea);
-            vanillaIds.Add(0x49f4);
-            vanillaIds.Add(0x49f7);
-            vanillaIds.Add(0x49f9);
-            vanillaIds.Add(0x4a06);
-            vanillaIds.Add(0x4a31);
-            vanillaIds.Add(0x4a32);
-            vanillaIds.Add(0x4a35);
-            vanillaIds.Add(0x4792);
-            vanillaIds.Add(0x452f);
-            vanillaIds.Add(0x453f);
-            vanillaIds.Add(0x454c);
-            vanillaIds.Add(0x455c);
-            vanillaIds.Add(0x455d);
-            vanillaIds.Add(0x4561);
-            vanillaIds.Add(0x4565);
-            vanillaIds.Add(0x4566);
-            vanillaIds.Add(0x45a0);
-            vanillaIds.Add(0x45c8);
-            vanillaIds.Add(0x45c9);
-            vanillaIds.Add(0x45cd);
-            vanillaIds.Add(0x4197);
-            vanillaIds.Add(0x4199);
-            vanillaIds.Add(0x419b);
-            vanillaIds.Add(0x419d);
-            vanillaIds.Add(0x419f);
-            vanillaIds.Add(0x4198);
-            vanillaIds.Add(0x419a);
-            vanillaIds.Add(0x419c);
-            vanillaIds.Add(0x419e);
-            vanillaIds.Add(0x41a0);
-            vanillaIds.Add(0x41a1);
-            vanillaIds.Add(0x41a2);
-            vanillaIds.Add(0x41a3);
-            vanillaIds.Add(0x417e);
-            vanillaIds.Add(0x404f);
-            vanillaIds.Add(0x4051);
-            vanillaIds.Add(0x4052);
-            vanillaIds.Add(0x4055);
-            vanillaIds.Add(0x4053);
-            vanillaIds.Add(0x4056);
-            vanillaIds.Add(0x405e);
-            vanillaIds.Add(0x405f);
-            vanillaIds.Add(0x4063);
-            vanillaIds.Add(0x406f);
-            vanillaIds.Add(0x4074);
-            vanillaIds.Add(0x4075);
-            vanillaIds.Add(0x4076);
-            vanillaIds.Add(0x407d);
-            vanillaIds.Add(0x407f);
-            vanillaIds.Add(0x4083);
-            vanillaIds.Add(0x4080);
-            vanillaIds.Add(0x4081);
-            vanillaIds.Add(0x4082);
-            vanillaIds.Add(0x4084);
-            vanillaIds.Add(0x408e);
-            vanillaIds.Add(0x4091);
-            vanillaIds.Add(0x4092);
-            vanillaIds.Add(0x4094);
-            vanillaIds.Add(0x4095);
-            vanillaIds.Add(0x409c);
-            vanillaIds.Add(0x409d);
-            vanillaIds.Add(0x40aa);
-            vanillaIds.Add(0x40ab);
-            vanillaIds.Add(0x40ad);
-            vanillaIds.Add(0x40ae);
-            vanillaIds.Add(0x272b);
-            vanillaIds.Add(0x222a);
-            vanillaIds.Add(0x222d);
-            vanillaIds.Add(0x222e);
-            vanillaIds.Add(0x223b);
-            vanillaIds.Add(0x2265);
-            vanillaIds.Add(0x2267);
-            vanillaIds.Add(0x2268);
-            vanillaIds.Add(0x2269);
-            vanillaIds.Add(0x2274);
-            vanillaIds.Add(0x2290);
-            vanillaIds.Add(0x2291);
-            vanillaIds.Add(0x2292);
-            vanillaIds.Add(0x229c);
-            vanillaIds.Add(0x229e);
-            vanillaIds.Add(0x22a8);
-            vanillaIds.Add(0x22b3);
-            vanillaIds.Add(0x22b5);
-            vanillaIds.Add(0x22b7);
-            vanillaIds.Add(0x22d1);
-            vanillaIds.Add(0x4575);
-            vanillaIds.Add(0x2335);
-            vanillaIds.Add(0x1ebb);
-            vanillaIds.Add(0x1cdd);
-            vanillaIds.Add(0x1cee);
-            vanillaIds.Add(0x1cef);
-            vanillaIds.Add(0x1cf1);
-            vanillaIds.Add(0x1cf3);
-            vanillaIds.Add(0x1cf4);
-            vanillaIds.Add(0x1cf7);
-            vanillaIds.Add(0x1cfc);
-            vanillaIds.Add(0x1d17);
-            vanillaIds.Add(0x1d00);
-            vanillaIds.Add(0x1d01);
-            vanillaIds.Add(0x1d05);
-            vanillaIds.Add(0x1d07);
-            vanillaIds.Add(0x1d0b);
-            vanillaIds.Add(0x1d0d);
-            vanillaIds.Add(0x1d0f);
-            vanillaIds.Add(0x1d12);
-            vanillaIds.Add(0x1d13);
-            vanillaIds.Add(0x1d4f);
-            vanillaIds.Add(0x1d64);
-            vanillaIds.Add(0x1d50);
-            vanillaIds.Add(0x1d58);
-            vanillaIds.Add(0x1d59);
-            vanillaIds.Add(0x1d51);
-            vanillaIds.Add(0x1d53);
-            vanillaIds.Add(0x1d66);
-            vanillaIds.Add(0x1d55);
-            vanillaIds.Add(0xdda);
-            vanillaIds.Add(0xddd);
-            vanillaIds.Add(0xdde);
-            vanillaIds.Add(0xde3);
-            vanillaIds.Add(0xdf0);
-            vanillaIds.Add(0xe00);
-            vanillaIds.Add(0xe0b);
-            vanillaIds.Add(0xe0c);
-            vanillaIds.Add(0xe0e);
-            vanillaIds.Add(0xe0f);
-            vanillaIds.Add(0xe11);
-            vanillaIds.Add(0xe18);
-            vanillaIds.Add(0xfed);
-            vanillaIds.Add(0xff7);
-            vanillaIds.Add(0xffb);
-            vanillaIds.Add(0xfe9);
-            vanillaIds.Add(0xb30);
-            vanillaIds.Add(0x12e);
-            vanillaIds.Add(0x8d3);
-            vanillaIds.Add(0x8d4);
-            vanillaIds.Add(0x8d5);
-            vanillaIds.Add(0x8d7);
-            vanillaIds.Add(0xb32);
-            vanillaIds.Add(0xb34);
-            vanillaIds.Add(0xb38);
-            vanillaIds.Add(0xb3e);
-            vanillaIds.Add(0x12d);
-            vanillaIds.Add(0x26);
-            vanillaIds.Add(0x31);
-            vanillaIds.Add(0x33);
-            vanillaIds.Add(0x4b);
-            vanillaIds.Add(0x62);
-            vanillaIds.Add(0x64);
-            vanillaIds.Add(0x71);
-            vanillaIds.Add(0x77);
-            vanillaIds.Add(0x7f);
-            vanillaIds.Add(0x79);
-            vanillaIds.Add(0x84);
-            vanillaIds.Add(0x90);
-            vanillaIds.Add(0x99);
-            vanillaIds.Add(0xa4);
-            vanillaIds.Add(0xb2);
-            vanillaIds.Add(0xa8);
-            vanillaIds.Add(0xac);
-            vanillaIds.Add(0xb8);
-            vanillaIds.Add(0xe2);
-            vanillaIds.Add(0x10f);
-            vanillaIds.Add(0xf3);
-            vanillaIds.Add(0x10e);
-            vanillaIds.Add(0x110);
-            vanillaIds.Add(0x111);
+            var dictionary = new ActionDictionary.Ids();
+            var vanillaDictionary = dictionary.Vanilla();
+            for (var i = 0; i < vanillaDictionary.Length; i++)
+            {
+                vanillaIds.Add(vanillaDictionary[i]);  
+            }
+            var customDictionary = dictionary.Custom();
+            for (var i = 0; i < customDictionary.Length; i++)
+            {
+                customIds.Add(customDictionary[i]);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using XIVComboPlugin.JobActions;
 
 namespace XIVComboPlugin
@@ -180,6 +181,7 @@ namespace XIVComboPlugin
         [CustomComboInfo("Verproc into Jolt", "Replaces Verstone/Verfire with Jolt/Scorch when no proc is available.", 35, new uint[] { RDM.Verstone, RDM.Verfire })]
         RedMageVerprocCombo = 1L << 53
     }
+
 
     public class CustomComboInfoAttribute : Attribute
     {

@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BuffArray.cs" />
+    <Compile Include="Dictonary.cs" />
     <Compile Include="Configuration\CustomComboPreset.cs" />
     <Compile Include="IconReplacer.cs" />
     <Compile Include="IconReplacerAddressResolver.cs" />
