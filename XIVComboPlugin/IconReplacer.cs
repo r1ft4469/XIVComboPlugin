@@ -400,75 +400,60 @@ namespace XIVComboPlugin
             if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiYukikazeCombo))
                 if (actionID == SAM.Yukikaze)
                 {
-                    UpdateBuffAddress();
-                    if (SearchBuffArray(1233))
-                        return SAM.Yukikaze;
-                    if (comboTime > 0)
-                        if (lastMove == SAM.Hakaze && level >= 50)
-                            return SAM.Yukikaze;
-                    return SAM.Hakaze;
+                    SAMcombo combo = new SAMcombo();
+                    foreach (uint a in combo.Single_Combo(clientState, comboTime, lastMove, level))
+                    {
+                        if (a != 0)
+                            return a;
+                    }
                 }
 
             // Replace Gekko with Gekko combo
             if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiGekkoCombo))
                 if (actionID == SAM.Gekko)
                 {
-                    UpdateBuffAddress();
-                    if (SearchBuffArray(1233))
-                        return SAM.Gekko;
-                    if (comboTime > 0)
+                    SAMcombo combo = new SAMcombo();
+                    foreach (uint a in combo.Gekko_Combo(clientState, comboTime, lastMove, level))
                     {
-                        if (lastMove == SAM.Hakaze && level >= 4)
-                            return SAM.Jinpu;
-                        if (lastMove == SAM.Jinpu && level >= 30)
-                            return SAM.Gekko;
+                        if (a != 0)
+                            return a;
                     }
-
-                    return SAM.Hakaze;
                 }
 
             // Replace Kasha with Kasha combo
             if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiKashaCombo))
                 if (actionID == SAM.Kasha)
                 {
-                    UpdateBuffAddress();
-                    if (SearchBuffArray(1233))
-                        return SAM.Kasha;
-                    if (comboTime > 0)
+                    SAMcombo combo = new SAMcombo();
+                    foreach (uint a in combo.Kasha_Combo(clientState, comboTime, lastMove, level))
                     {
-                        if (lastMove == SAM.Hakaze && level >= 18)
-                            return SAM.Shifu;
-                        if (lastMove == SAM.Shifu && level >= 40)
-                            return SAM.Kasha;
+                        if (a != 0)
+                            return a;
                     }
-
-                    return SAM.Hakaze;
                 }
 
             // Replace Mangetsu with Mangetsu combo
             if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiMangetsuCombo))
                 if (actionID == SAM.Mangetsu)
                 {
-                    UpdateBuffAddress();
-                    if (SearchBuffArray(1233))
-                        return SAM.Mangetsu;
-                    if (comboTime > 0)
-                        if (lastMove == SAM.Fuga && level >= 35)
-                            return SAM.Mangetsu;
-                    return SAM.Fuga;
+                    SAMcombo combo = new SAMcombo();
+                    foreach (uint a in combo.Aoe_Combo(clientState, comboTime, lastMove, level))
+                    {
+                        if (a != 0)
+                            return a;
+                    }
                 }
 
             // Replace Oka with Oka combo
             if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiOkaCombo))
                 if (actionID == SAM.Oka)
                 {
-                    UpdateBuffAddress();
-                    if (SearchBuffArray(1233))
-                        return SAM.Oka;
-                    if (comboTime > 0)
-                        if (lastMove == SAM.Fuga && level >= 45)
-                            return SAM.Oka;
-                    return SAM.Fuga;
+                    SAMcombo combo = new SAMcombo();
+                    foreach (uint a in combo.Oka_Combo(clientState, comboTime, lastMove, level))
+                    {
+                        if (a != 0)
+                            return a;
+                    }
                 }
 
             // Turn Seigan into Third Eye when not procced
@@ -1044,6 +1029,11 @@ namespace XIVComboPlugin
 
         private void PopulateDict()
         {
+            customIds.Add(8831);
+            customIds.Add(7867);
+            customIds.Add(7490);
+            customIds.Add(7491);
+            customIds.Add(7494);
             customIds.Add(16477);
             customIds.Add(88);
             customIds.Add(84);
