@@ -2,6 +2,10 @@
 using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using System;
+using Dalamud.Plugin;
+using System.Linq;
+using System.Runtime.ExceptionServices;
+using ImGuiNET;
 
 namespace XIVComboPlugin.JobActions
 {
@@ -75,13 +79,15 @@ namespace XIVComboPlugin.JobActions
 
         private uint Seigan_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
-            if (Array.Exists(clientState.LocalPlayer.statusEffects, StatusEffect => StatusEffect.EffectId == 1252))
+            var buffArray = new BuffArray();
+            if (buffArray.SearchPlayer(1252, clientState))
                 return SAM.Seigan;
             return 0;
         }
         private uint Oka_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
-            if (Array.Exists(clientState.LocalPlayer.statusEffects, StatusEffect => StatusEffect.EffectId == 1233))
+            var buffArray = new BuffArray();
+            if (buffArray.SearchPlayer(1233, clientState))
                 return SAM.Oka;
             if (comboTime > 0)
             {
@@ -92,7 +98,8 @@ namespace XIVComboPlugin.JobActions
         }
         private uint Mangetsu_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
-            if (Array.Exists(clientState.LocalPlayer.statusEffects, StatusEffect => StatusEffect.EffectId == 1233))
+            var buffArray = new BuffArray();
+            if (buffArray.SearchPlayer(1233, clientState))
                 return SAM.Mangetsu;
             if (comboTime > 0)
             {
@@ -103,7 +110,8 @@ namespace XIVComboPlugin.JobActions
         }
         private uint Kasha_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
-            if (Array.Exists(clientState.LocalPlayer.statusEffects, StatusEffect => StatusEffect.EffectId == 1233))
+            var buffArray = new BuffArray();
+            if (buffArray.SearchPlayer(1233, clientState))
                 return SAM.Kasha;
             if (comboTime > 0)
             {
@@ -132,7 +140,8 @@ namespace XIVComboPlugin.JobActions
         }
         private uint Gekko_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
-            if (Array.Exists(clientState.LocalPlayer.statusEffects, StatusEffect => StatusEffect.EffectId == 1233))
+            var buffArray = new BuffArray();
+            if (buffArray.SearchPlayer(1233, clientState))
                 return SAM.Gekko;
             if (comboTime > 0)
             {
@@ -143,7 +152,8 @@ namespace XIVComboPlugin.JobActions
         }
         private uint Yukikaze_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
-            if (Array.Exists(clientState.LocalPlayer.statusEffects, StatusEffect => StatusEffect.EffectId == 1233))
+            var buffArray = new BuffArray();
+            if (buffArray.SearchPlayer(1233, clientState))
                 return SAM.Yukikaze;
             if (comboTime > 0)
             {
@@ -157,13 +167,15 @@ namespace XIVComboPlugin.JobActions
         ///EXTRA
         public uint[] Single_Combo(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
-            return new uint[] {
+            return new uint[]
+            {
                 MeikyoShisui_Conditional(clientState, comboTime, lastMove, level),
                 HissatsuShinten_Conditional(clientState, comboTime, lastMove, level),
                 MidareSetsugekka_Conditional(clientState, comboTime, lastMove, level),
                 Ka_Conditional(clientState, comboTime, lastMove, level),
                 Getsu_Conditional(clientState, comboTime, lastMove, level),
-                Setsu_Conditional(clientState, comboTime, lastMove, level),                
+                Higanbana_Conditional(clientState, comboTime, lastMove, level),
+                Setsu_Conditional(clientState, comboTime, lastMove, level),
                 Kasha_Conditional(clientState, comboTime, lastMove, level),
                 Shifu_Conditional(clientState, comboTime, lastMove, level),
                 Gekko_Conditional(clientState, comboTime, lastMove, level),
@@ -187,7 +199,8 @@ namespace XIVComboPlugin.JobActions
         }
         private uint MeikyoShisui_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
-            if (Array.Exists(clientState.LocalPlayer.statusEffects, StatusEffect => StatusEffect.EffectId == 1233))
+            var buffArray = new BuffArray();
+            if (buffArray.SearchPlayer(1233, clientState))
             {
                 if (!clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU) && level >= 50)
                     return SAM.Yukikaze;
@@ -199,7 +212,7 @@ namespace XIVComboPlugin.JobActions
                 {
                     if (clientState.JobGauges.Get<SAMGauge>().Kenki >= 20 && level >= 52)
                     {
-                        if (!Array.Exists(clientState.LocalPlayer.statusEffects, StatusEffect => StatusEffect.EffectId == 1229))
+                        if (!buffArray.SearchPlayer(1229, clientState))
                             return SAM.HissatsuKaiten;
                     }
                     return SAM.Iaijutsu;
@@ -209,7 +222,8 @@ namespace XIVComboPlugin.JobActions
         }
         private uint MeikyoShisuiAOE_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
-            if (Array.Exists(clientState.LocalPlayer.statusEffects, StatusEffect => StatusEffect.EffectId == 1233))
+            var buffArray = new BuffArray();
+            if (buffArray.SearchPlayer(1233, clientState))
             {
                 if (!clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) && level >= 40)
                     return SAM.Oka;
@@ -219,7 +233,7 @@ namespace XIVComboPlugin.JobActions
                 {
                     if (clientState.JobGauges.Get<SAMGauge>().Kenki >= 20 && level >= 52)
                     {
-                        if (!Array.Exists(clientState.LocalPlayer.statusEffects, StatusEffect => StatusEffect.EffectId == 1229))
+                        if (!buffArray.SearchPlayer(1229, clientState))
                             return SAM.HissatsuKaiten;
                     }
                     return SAM.Iaijutsu;
@@ -229,11 +243,12 @@ namespace XIVComboPlugin.JobActions
         }
         private uint TenkaGoken_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
+            var buffArray = new BuffArray();
             if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) && level >= 30)
             {
                 if (clientState.JobGauges.Get<SAMGauge>().Kenki >= 20 && level >= 52)
                 {
-                    if (!Array.Exists(clientState.LocalPlayer.statusEffects, StatusEffect => StatusEffect.EffectId == 1229))
+                    if (!buffArray.SearchPlayer(1229, clientState))
                         return SAM.HissatsuKaiten;
                 }
                 return SAM.Iaijutsu;
@@ -242,11 +257,12 @@ namespace XIVComboPlugin.JobActions
         }
         private uint MidareSetsugekka_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
+            var buffArray = new BuffArray();
             if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU) && level >= 30)
             {
                 if (clientState.JobGauges.Get<SAMGauge>().Kenki >= 20 && level >= 52)
                 {
-                    if (!Array.Exists(clientState.LocalPlayer.statusEffects, StatusEffect => StatusEffect.EffectId == 1229))
+                    if (!buffArray.SearchPlayer(1229, clientState))
                         return SAM.HissatsuKaiten;
                 }
                 return SAM.Iaijutsu;
@@ -313,16 +329,28 @@ namespace XIVComboPlugin.JobActions
                 {
                     if (lastMove == SAM.Hakaze && level >= 4)
                         return SAM.Jinpu;
-                    if (Array.Find(clientState.Targets.CurrentTarget.statusEffects, StatusEffect => StatusEffect.EffectId == 1228).Duration < 15 && level >= 30 && lastMove == SAM.Jinpu)
+                }
+            }
+            return 0;
+        }
+        private uint Higanbana_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
+        {
+            if (comboTime > 0)
+            {
+                if (lastMove == SAM.Jinpu)
+                {
+                    var buffArray = new BuffArray();
+                    if (!buffArray.SearchTarget(1228, clientState, 0, 15))
                     {
-                        if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU) || clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) || clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU))
+                        if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) || clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) || clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU))
                         {
                             if (clientState.JobGauges.Get<SAMGauge>().Kenki >= 20 && level >= 52)
                             {
-                                if (!Array.Exists(clientState.LocalPlayer.statusEffects, StatusEffect => StatusEffect.EffectId == 1229))
+                                if (!buffArray.SearchPlayer(1229, clientState))
                                     return SAM.HissatsuKaiten;
                             }
-                            return SAM.Iaijutsu;
+                            if (level >= 30)
+                                return SAM.Iaijutsu;
                         }
                     }
                 }

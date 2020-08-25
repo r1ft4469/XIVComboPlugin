@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Dalamud.Plugin;
 using System.Dynamic;
+using System.Text;
 
 namespace XIVComboPlugin
 {
@@ -996,6 +997,24 @@ namespace XIVComboPlugin
             ping = (float)(value)/1000;
         }
         */
+        public bool SearchTargetBuffArray(short needle, int owner = 0, float duration = 0)
+        {
+            owner = clientState.LocalPlayer.ActorId;
+            if (clientState.Targets.CurrentTarget != null)
+            {
+                if (clientState.Targets.CurrentTarget.statusEffects.Length > 0)
+                {
+                    var targetEffects = clientState.Targets.CurrentTarget.statusEffects;
+                    for (var i = 0; i < targetEffects.Length; i++)
+                    {
+                        if (targetEffects[i].EffectId == needle && targetEffects[i].OwnerId == owner && targetEffects[i].Duration > duration)
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         private bool SearchBuffArray(short needle)
         {
             if (activeBuffArray == IntPtr.Zero) return false;
