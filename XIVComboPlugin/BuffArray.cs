@@ -33,11 +33,11 @@ namespace XIVComboPlugin
         {
             if (owner == 0)
                 owner = clientState.LocalPlayer.ActorId;
-            if (clientState.Targets.CurrentTarget != null)
+            if (clientState.LocalPlayer != null)
             {
                 if (clientState.LocalPlayer.statusEffects.Length > 0)
                 {
-                    var statusEffects = clientState.Targets.CurrentTarget.statusEffects;
+                    var statusEffects = clientState.LocalPlayer.statusEffects;
                     for (var i = 0; i < statusEffects.Length; i++)
                     {
                         if (statusEffects[i].EffectId == needle && statusEffects[i].OwnerId == owner && statusEffects[i].Duration > duration)
