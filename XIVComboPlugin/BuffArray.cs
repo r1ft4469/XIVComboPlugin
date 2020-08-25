@@ -47,27 +47,5 @@ namespace XIVComboPlugin
             }
             return false;
         }
-
-        public bool SearchActorCount(ClientState clientState, int actorAmmount = 0)
-        {
-            var actorCount = 0;
-            if (clientState.Actors != null)
-            {
-                if (clientState.Actors.Length > 0)
-                {
-                    var actors = clientState.Actors;
-                    for (var i = 0; i < clientState.Actors.Length; i++)
-                    {
-                        if (actors[i].ObjectKind == Dalamud.Game.ClientState.Actors.ObjectKind.BattleNpc && actors[i].YalmDistanceX < 10 && actors[i].YalmDistanceY < 10)
-                        {
-                            actorCount++;
-                        }
-                    }
-                    if (actorCount >= actorAmmount)
-                        return true;
-                }
-            }
-            return false;
-        }
     }
 }

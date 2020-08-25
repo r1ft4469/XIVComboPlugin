@@ -22,12 +22,14 @@ namespace XIVComboPlugin.JobActions
             Fuga = 7483,
             Oka = 7485,
             Seigan = 7501,
+            ThirdEye = 7498,
+            // EXTRA IDS Personal Use
             MidareSetsugekka = 8831,
             Iaijutsu = 7867,
             HissatsuShinten = 7490,
             HissatsuKyuten = 7491,
-            HissatsuKaiten = 7494,
-            ThirdEye = 7498;
+            HissatsuKaiten = 7494;
+
     }
 
     public class SAMcombo
@@ -164,7 +166,7 @@ namespace XIVComboPlugin.JobActions
         }
 
 
-        ///EXTRA
+        // EXTRA Combos and Conditionals for Personal Use
         public uint[] Single_Combo(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
             return new uint[]
