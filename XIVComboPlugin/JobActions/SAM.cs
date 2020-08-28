@@ -24,10 +24,15 @@ namespace XIVComboPlugin.JobActions
             Seigan = 7501,
             ThirdEye = 7498,
             // EXTRA IDS Personal Use
-            MidareSetsugekka = 8831,
-            Iaijutsu = 7867,
+            MercifulEyes = 7502,
+            Enpi = 7486,
+            MidareSetsugekka = 7487,
+            TenkaGoken = 7488,
+            Higanbana = 7489,
             HissatsuShinten = 7490,
             HissatsuKyuten = 7491,
+            HissatsuGyoten = 7492,
+            HissatsuYaten = 7493,
             HissatsuKaiten = 7494;
 
     }
@@ -83,7 +88,10 @@ namespace XIVComboPlugin.JobActions
         {
             var buffArray = new BuffArray();
             if (buffArray.SearchPlayer(1252, clientState))
-                return SAM.Seigan;
+            {
+                if (clientState.JobGauges.Get<SAMGauge>().Kenki >= 15 && level >= 66)
+                    return SAM.Seigan;
+            }
             return 0;
         }
         private uint Oka_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
@@ -172,6 +180,7 @@ namespace XIVComboPlugin.JobActions
             return new uint[]
             {
                 MeikyoShisui_Conditional(clientState, comboTime, lastMove, level),
+                Seigan_Conditional(clientState, comboTime, lastMove, level),
                 HissatsuShinten_Conditional(clientState, comboTime, lastMove, level),
                 MidareSetsugekka_Conditional(clientState, comboTime, lastMove, level),
                 Ka_Conditional(clientState, comboTime, lastMove, level),
@@ -199,6 +208,61 @@ namespace XIVComboPlugin.JobActions
                 SAM.Fuga
             };
         }
+        public uint[] MercifulEyes_Combo(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
+        {
+            return new uint[] {
+                MercifulEyes_Conditional(clientState, comboTime, lastMove, level),
+                SAM.ThirdEye
+            };
+        }
+        public uint[] Disenguage_Combo(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
+        {
+            return new uint[] {
+                HissatsuYaten_Conditional(clientState, comboTime, lastMove, level),
+                SAM.Enpi
+            };
+        }
+        public uint[] Enguage_Combo(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
+        {
+            return new uint[] {
+                HissatsuGyoten_Conditional(clientState, comboTime, lastMove, level),
+                SAM.Enpi
+            };
+        }
+        private uint HissatsuGyoten_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
+        {
+            if (clientState.Targets.CurrentTarget != null)
+            {
+                if (clientState.Targets.CurrentTarget.YalmDistanceX > 5)
+                {
+                    if (clientState.JobGauges.Get<SAMGauge>().Kenki >= 10 && level >= 54)
+                        return SAM.HissatsuGyoten;
+                }
+            }
+            return 0;
+        }
+        private uint HissatsuYaten_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
+        {
+            if (clientState.Targets.CurrentTarget != null)
+            {
+                if (clientState.Targets.CurrentTarget.YalmDistanceX < 5)
+                {
+                    if (clientState.JobGauges.Get<SAMGauge>().Kenki >= 10 && level >= 56)
+                        return SAM.HissatsuYaten;
+                }
+            }
+            return 0;
+        }
+        private uint MercifulEyes_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
+        {
+            var buffArray = new BuffArray();
+            if (buffArray.SearchPlayer(1252, clientState))
+            {
+                if (clientState.LocalPlayer.CurrentHp < clientState.LocalPlayer.MaxHp && level >= 58)
+                    return SAM.MercifulEyes;
+            }
+            return 0;
+        }
         private uint MeikyoShisui_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
             var buffArray = new BuffArray();
@@ -217,7 +281,7 @@ namespace XIVComboPlugin.JobActions
                         if (!buffArray.SearchPlayer(1229, clientState))
                             return SAM.HissatsuKaiten;
                     }
-                    return SAM.Iaijutsu;
+                    return SAM.MidareSetsugekka;
                 }
             }
             return 0;
@@ -238,7 +302,7 @@ namespace XIVComboPlugin.JobActions
                         if (!buffArray.SearchPlayer(1229, clientState))
                             return SAM.HissatsuKaiten;
                     }
-                    return SAM.Iaijutsu;
+                    return SAM.TenkaGoken;
                 }
             }
             return 0;
@@ -253,7 +317,7 @@ namespace XIVComboPlugin.JobActions
                     if (!buffArray.SearchPlayer(1229, clientState))
                         return SAM.HissatsuKaiten;
                 }
-                return SAM.Iaijutsu;
+                return SAM.TenkaGoken;
             }
             return 0;
         }
@@ -267,7 +331,7 @@ namespace XIVComboPlugin.JobActions
                     if (!buffArray.SearchPlayer(1229, clientState))
                         return SAM.HissatsuKaiten;
                 }
-                return SAM.Iaijutsu;
+                return SAM.MidareSetsugekka;
             }
             return 0;
         }
@@ -345,14 +409,22 @@ namespace XIVComboPlugin.JobActions
                     if (!buffArray.SearchTarget(1228, clientState, 0, 15))
                     {
                         if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) || clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) || clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU))
-                        {
+                        { 
+                            if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA))
+                                return 0;
+                            if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU))
+                                return 0;
+                            if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU))
+                                return 0;
+                            if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU))
+                                return 0;
                             if (clientState.JobGauges.Get<SAMGauge>().Kenki >= 20 && level >= 52)
                             {
                                 if (!buffArray.SearchPlayer(1229, clientState))
                                     return SAM.HissatsuKaiten;
                             }
                             if (level >= 30)
-                                return SAM.Iaijutsu;
+                                return SAM.Higanbana;
                         }
                     }
                 }

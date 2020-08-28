@@ -408,10 +408,10 @@ namespace XIVComboPlugin
 
                 // Replace Gekko with Gekko combo
                 if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiGekkoCombo))
-                    if (actionID == SAM.Gekko)
+                    if (actionID == SAM.HissatsuYaten)
                     {
                         SAMcombo combo = new SAMcombo();
-                        foreach (uint a in combo.Gekko_Combo(clientState, comboTime, lastMove, level))
+                        foreach (uint a in combo.Disenguage_Combo(clientState, comboTime, lastMove, level))
                         {
                             if (a != 0)
                                 return a;
@@ -420,10 +420,10 @@ namespace XIVComboPlugin
 
                 // Replace Kasha with Kasha combo
                 if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiKashaCombo))
-                    if (actionID == SAM.Kasha)
+                    if (actionID == SAM.HissatsuGyoten)
                     {
                         SAMcombo combo = new SAMcombo();
-                        foreach (uint a in combo.Kasha_Combo(clientState, comboTime, lastMove, level))
+                        foreach (uint a in combo.Enguage_Combo(clientState, comboTime, lastMove, level))
                         {
                             if (a != 0)
                                 return a;
@@ -457,10 +457,10 @@ namespace XIVComboPlugin
 
                 // Turn Seigan into Third Eye when not procced
                 if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiThirdEyeFeature))
-                    if (actionID == SAM.Seigan)
+                    if (actionID == SAM.MercifulEyes)
                     {
                         SAMcombo combo = new SAMcombo();
-                        foreach (uint a in combo.Seigan_Combo(clientState, comboTime, lastMove, level))
+                        foreach (uint a in combo.MercifulEyes_Combo(clientState, comboTime, lastMove, level))
                         {
                             if (a != 0)
                                 return a;

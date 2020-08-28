@@ -19,10 +19,15 @@ namespace XIVComboPlugin.ActionDictionary
             return new uint[]
             {
                 /// EXTRA
-                8831,
-                7867,
+                7502,
+                7486,
+                7487,
+                7488,
+                7489,
                 7490,
                 7491,
+                7492,
+                7493,
                 7494,
                 ///
                 16477,

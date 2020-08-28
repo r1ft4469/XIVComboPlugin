@@ -5,12 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace XIVComboPlugin
 {
     public class BuffArray
     {
+
         public bool SearchTarget(short needle,ClientState clientState, int owner = 0, float duration = 0)
         {
             if (owner == 0)

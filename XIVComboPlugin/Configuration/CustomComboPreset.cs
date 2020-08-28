@@ -57,22 +57,22 @@ namespace XIVComboPlugin
         WarriorMythrilTempestCombo = 1L << 10,
 
         // SAMURAI
-        [CustomComboInfo("Yukikaze Combo", "Replace Yukikaze with its combo chain", 34, new uint[] { SAM.Yukikaze })]
+        [CustomComboInfo("Single Target Combo", "Replace Yukikaze with its combo chain", 34, new uint[] { SAM.Yukikaze })]
         SamuraiYukikazeCombo = 1L << 11,
 
-        [CustomComboInfo("Gekko Combo", "Replace Gekko with its combo chain", 34, new uint[] { SAM.Gekko })]
+        [CustomComboInfo("Disenguage Combo", "Replace Enpi with its combo chain", 34, new uint[] { SAM.HissatsuYaten })]
         SamuraiGekkoCombo = 1L << 12,
 
-        [CustomComboInfo("Kasha Combo", "Replace Kasha with its combo chain", 34, new uint[] { SAM.Kasha })]
+        [CustomComboInfo("Enguage Combo", "Replace Kasha with its combo chain", 34, new uint[] { SAM.HissatsuGyoten })]
         SamuraiKashaCombo = 1L << 13,
 
-        [CustomComboInfo("Mangetsu Combo", "Replace Mangetsu with its combo chain", 34, new uint[] { SAM.Mangetsu })]
+        [CustomComboInfo("AOE Combo", "Replace Mangetsu with its combo chain", 34, new uint[] { SAM.Mangetsu })]
         SamuraiMangetsuCombo = 1L << 14,
 
         [CustomComboInfo("Oka Combo", "Replace Oka with its combo chain", 34, new uint[] { SAM.Oka })]
         SamuraiOkaCombo = 1L << 15,
 
-        [CustomComboInfo("Seigan to Third Eye", "Replace Seigan with Third Eye when not procced", 34, new uint[] { SAM.Seigan })]
+        [CustomComboInfo("Seigan to Third Eye", "Replace Merciful Eyes with Third Eye when not procced", 34, new uint[] { SAM.ThirdEye })]
         SamuraiThirdEyeFeature = 1L << 51,
 
 
