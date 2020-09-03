@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("XIVComboPlugin")]
+[assembly: AssemblyTitle("XIVCustom")]
 [assembly: AssemblyDescription("This plugin condenses combos and mutually exclusive abilities onto a single button.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("XIVComboPlugin")]
-[assembly: AssemblyCopyright("Copyleft attick 2020 baybeeee")]
+[assembly: AssemblyProduct("XIVCustom")]
+[assembly: AssemblyCopyright("Copyleft attick 2020 baybeeee r1ft")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("619df476-7225-4783-95a5-d29a8816ee66")]
+[assembly: Guid("D4C7780A-8546-4C3F-A189-6A5743A8EDB0")]
 
 // Version information for an assembly consists of the following four values:
 //

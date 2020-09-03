@@ -29,6 +29,8 @@ namespace XIVComboPlugin.ActionDictionary
                 7492,
                 7493,
                 7494,
+                7499,
+                16162,
                 ///
                 16477,
                 88,

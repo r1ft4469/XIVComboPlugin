@@ -3,10 +3,12 @@ using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Structs;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using XIVComboPlugin.JobActions;
 
 namespace XIVComboPlugin
 {

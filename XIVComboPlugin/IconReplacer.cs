@@ -47,7 +47,13 @@ namespace XIVComboPlugin
 
         private unsafe delegate int* getArray(long* address);
 
+        public static uint
+            LastAction,
+            CurrentAction;
+
         private bool shutdown;
+
+        public static Stack<uint> ActionStack;
 
         public IconReplacer(SigScanner scanner, ClientState clientState, XIVComboConfiguration configuration)
         {
@@ -71,6 +77,13 @@ namespace XIVComboPlugin
             vanillaIds = new HashSet<uint>();
             noUpdateIcons = new HashSet<uint>();
             seenNoUpdate = new HashSet<uint>();
+
+            LastAction = 0;
+            CurrentAction = 0;
+            ActionStack = new Stack<uint>();
+            ActionStack.Push(0);
+            ActionStack.Push(0);
+
 
             PopulateDict();
 
@@ -140,7 +153,8 @@ namespace XIVComboPlugin
             {
                 return 1;
             }
-            if (!seenNoUpdate.Contains(actionID)) { 
+            if (!seenNoUpdate.Contains(actionID)) 
+            {
                 return 1;
             }
             return 0;
@@ -157,7 +171,11 @@ namespace XIVComboPlugin
         /// </summary>
         private ulong GetIconDetour(byte self, uint actionID)
         {
-            
+            if (CurrentAction == SAM.MeikyoShisui)
+            {
+                PluginLog.Log("Current = " + CurrentAction.ToString());
+                PluginLog.Log("Last = " + LastAction.ToString());
+            }
             if (clientState.LocalPlayer == null) return iconHook.Original(self, actionID);
             var job = clientState.LocalPlayer.ClassJob.Id;
             if (lastJob != job)
@@ -174,6 +192,7 @@ namespace XIVComboPlugin
             if (vanillaIds.Contains(actionID)) return iconHook.Original(self, actionID);
             if (!customIds.Contains(actionID)) return actionID;
             if (activeBuffArray == IntPtr.Zero) return iconHook.Original(self, actionID);
+            
 
             // Don't clutter the spaghetti any worse than it already is.
             var lastMove = Marshal.ReadInt32(lastComboMove);
@@ -387,8 +406,65 @@ namespace XIVComboPlugin
                         }
                     }
             }
-            
+
             //LEFT OFF ON DRK
+
+            // GUNBREAKER WIP
+            if (job == 37)
+            {
+                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.GunbreakerSolidBarrelCombo))
+                    if (actionID == GNB.SolidBarrel)
+                    {
+                        GNBcombo combo = new GNBcombo();
+                        foreach (uint a in combo.ST_Combo(clientState,comboTime, lastMove, level, actionID))
+                        {
+                            if (a != 0)
+                            {
+                                if (CurrentAction != a)
+                                {
+                                    CurrentAction = a;
+                                    ActionStack.Push(a);
+                                    if (ActionStack.Count > 2)
+                                    {
+                                        ActionStack.Pop();
+                                        LastAction = ActionStack.Pop();
+                                        ActionStack.Clear();
+                                        ActionStack.Push(LastAction);
+                                        ActionStack.Push(CurrentAction);
+                                    }
+                                }
+                                return a;
+                            }
+                        }
+                        //return actionID;
+                    }
+
+                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.GunbreakerGnashingFangCombo))
+                    if (actionID == GNB.WickedTalon)
+                    {
+                        GNBcombo combo = new GNBcombo();
+                        foreach (uint a in combo.WickedTalon_Combo(clientState, actionID, comboTime, lastMove, level))
+                        {
+                            if (a != 0)
+                            {
+                                return a;
+                            }
+                        }
+                    }
+
+                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.GunbreakerDemonSlaughterCombo))
+                    if (actionID == GNB.DemonSlaughter)
+                    {
+                        GNBcombo combo = new GNBcombo();
+                        foreach (uint a in combo.DemonSlaughter_Combo(clientState, comboTime, lastMove, level))
+                        {
+                            if (a != 0)
+                            {
+                                return a;
+                            }
+                        }
+                    }
+            }
 
             // SAMURAI
             if (job == 34)
@@ -398,12 +474,7 @@ namespace XIVComboPlugin
                 if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiYukikazeCombo))
                     if (actionID == SAM.Yukikaze)
                     {
-                        SAMcombo combo = new SAMcombo();
-                        foreach (uint a in combo.Single_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
+                        return ActionParse(new SAMcombo().Single_Combo(clientState, comboTime, lastMove, level), actionID);
                     }
 
                 // Replace Gekko with Gekko combo
@@ -471,6 +542,29 @@ namespace XIVComboPlugin
             return iconHook.Original(self, actionID);
         }
 
+        private uint ActionParse(uint[] ActionList, uint actionID)
+        {
+            foreach (uint a in ActionList)
+                if (a != 0)
+                {
+
+                    if (CurrentAction != a)
+                    {
+                        CurrentAction = a;
+                        ActionStack.Push(a);
+                        if (ActionStack.Count > 2)
+                        {
+                            ActionStack.Pop();
+                            LastAction = ActionStack.Pop();
+                            ActionStack.Clear();
+                            ActionStack.Push(LastAction);
+                            ActionStack.Push(CurrentAction);
+                        }
+                    }
+                    return a;
+                }
+            return actionID;
+        }
         private void UpdateBuffAddress()
         {
             try
@@ -483,7 +577,6 @@ namespace XIVComboPlugin
                 activeBuffArray = IntPtr.Zero;
             }
         }
-
         private unsafe IntPtr FindBuffAddress()
         {
             var num = Marshal.ReadIntPtr(BuffVTableAddr);

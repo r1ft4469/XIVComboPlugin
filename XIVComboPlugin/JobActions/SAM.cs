@@ -33,7 +33,14 @@ namespace XIVComboPlugin.JobActions
             HissatsuKyuten = 7491,
             HissatsuGyoten = 7492,
             HissatsuYaten = 7493,
+            MeikyoShisui = 7499,
             HissatsuKaiten = 7494;
+
+        public static bool
+            MeikyoShisui_Cooldown;
+
+        public static DateTime 
+            MeikyoShisui_CooldownTime;
 
     }
 
@@ -183,13 +190,13 @@ namespace XIVComboPlugin.JobActions
                 Seigan_Conditional(clientState, comboTime, lastMove, level),
                 HissatsuShinten_Conditional(clientState, comboTime, lastMove, level),
                 MidareSetsugekka_Conditional(clientState, comboTime, lastMove, level),
+                Higanbana_Conditional(clientState, comboTime, lastMove, level),
                 Ka_Conditional(clientState, comboTime, lastMove, level),
                 Getsu_Conditional(clientState, comboTime, lastMove, level),
-                Higanbana_Conditional(clientState, comboTime, lastMove, level),
                 Setsu_Conditional(clientState, comboTime, lastMove, level),
                 Kasha_Conditional(clientState, comboTime, lastMove, level),
-                Shifu_Conditional(clientState, comboTime, lastMove, level),
                 Gekko_Conditional(clientState, comboTime, lastMove, level),
+                Shifu_Conditional(clientState, comboTime, lastMove, level),
                 Jinpu_Conditional(clientState, comboTime, lastMove, level),
                 Yukikaze_Conditional(clientState, comboTime, lastMove, level),
                 SAM.Hakaze
@@ -266,6 +273,24 @@ namespace XIVComboPlugin.JobActions
         private uint MeikyoShisui_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
             var buffArray = new BuffArray();
+            if (IconReplacer.LastAction == SAM.MeikyoShisui)
+            {
+                SAM.MeikyoShisui_CooldownTime = DateTime.Now;
+                SAM.MeikyoShisui_Cooldown = true;
+            }
+            if (SAM.MeikyoShisui_Cooldown == false)
+            {
+                if (buffArray.SearchPlayer(1298, clientState, 0, 10) && buffArray.SearchPlayer(1299, clientState, 0, 10) && buffArray.SearchTarget(1228, clientState, 0, 15))
+                {
+                    if (!buffArray.SearchPlayer(1233, clientState) && IconReplacer.CurrentAction == SAM.Hakaze || !buffArray.SearchPlayer(1233, clientState) && IconReplacer.CurrentAction == SAM.MeikyoShisui)
+
+                        return SAM.MeikyoShisui;
+                }
+            }
+            if (SAM.MeikyoShisui_Cooldown == true && DateTime.Now.Subtract(SAM.MeikyoShisui_CooldownTime).TotalMilliseconds > 55000)
+            {
+                SAM.MeikyoShisui_Cooldown = false;
+            }
             if (buffArray.SearchPlayer(1233, clientState))
             {
                 if (!clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU) && level >= 50)
@@ -289,6 +314,20 @@ namespace XIVComboPlugin.JobActions
         private uint MeikyoShisuiAOE_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
             var buffArray = new BuffArray();
+            if (IconReplacer.LastAction == SAM.MeikyoShisui)
+            {
+                SAM.MeikyoShisui_CooldownTime = DateTime.Now;
+                SAM.MeikyoShisui_Cooldown = true;
+            }
+            if (SAM.MeikyoShisui_Cooldown == false)
+            {
+                    if (!buffArray.SearchPlayer(1233, clientState) && IconReplacer.CurrentAction == SAM.Fuga || !buffArray.SearchPlayer(1233, clientState) && IconReplacer.CurrentAction == SAM.MeikyoShisui)
+                        return SAM.MeikyoShisui;
+            }
+            if (SAM.MeikyoShisui_Cooldown == true && DateTime.Now.Subtract(SAM.MeikyoShisui_CooldownTime).TotalMilliseconds > 55000)
+            {
+                SAM.MeikyoShisui_Cooldown = false;
+            }
             if (buffArray.SearchPlayer(1233, clientState))
             {
                 if (!clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) && level >= 40)
@@ -348,7 +387,7 @@ namespace XIVComboPlugin.JobActions
             return 0;
         }
         private uint HissatsuShinten_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
-        {
+        {    
             if (clientState.JobGauges.Get<SAMGauge>().Kenki > 40 && level >= 62)
             {
                 return SAM.HissatsuShinten;
@@ -377,24 +416,40 @@ namespace XIVComboPlugin.JobActions
         }
         private uint Ka_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
+            var buffArray = new BuffArray();
             if (!clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) && level >= 40)
             {
-                if (comboTime > 0)
+                if (!buffArray.SearchPlayer(1298, clientState, 0, 15))
                 {
-                    if (lastMove == SAM.Hakaze && level >= 18)
-                        return SAM.Shifu;
+                    return 0;
+                }
+                else
+                {
+                    if (comboTime > 0)
+                    {
+                        if (lastMove == SAM.Hakaze && level >= 18)
+                            return SAM.Shifu;
+                    }
                 }
             }
             return 0;
         }
         private uint Getsu_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
+            var buffArray = new BuffArray();
             if (!clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) && level >= 30)
             {
-                if (comboTime > 0)
+                if (!buffArray.SearchPlayer(1299, clientState, 0, 15))
                 {
-                    if (lastMove == SAM.Hakaze && level >= 4)
-                        return SAM.Jinpu;
+                    return 0;
+                }
+                else
+                {
+                    if (comboTime > 0)
+                    {
+                        if (lastMove == SAM.Hakaze && level >= 4)
+                            return SAM.Jinpu;
+                    }
                 }
             }
             return 0;
@@ -403,29 +458,26 @@ namespace XIVComboPlugin.JobActions
         {
             if (comboTime > 0)
             {
-                if (lastMove == SAM.Jinpu)
+                var buffArray = new BuffArray();
+                if (buffArray.SearchPlayer(1298, clientState, 0, 10) && buffArray.SearchPlayer(1299, clientState, 0, 10) && !buffArray.SearchTarget(1228, clientState, 0, 15))
                 {
-                    var buffArray = new BuffArray();
-                    if (!buffArray.SearchTarget(1228, clientState, 0, 15))
+                    if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) || clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) || clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU))
                     {
-                        if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) || clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) || clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU))
-                        { 
-                            if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA))
-                                return 0;
-                            if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU))
-                                return 0;
-                            if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU))
-                                return 0;
-                            if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU))
-                                return 0;
-                            if (clientState.JobGauges.Get<SAMGauge>().Kenki >= 20 && level >= 52)
-                            {
-                                if (!buffArray.SearchPlayer(1229, clientState))
-                                    return SAM.HissatsuKaiten;
-                            }
-                            if (level >= 30)
-                                return SAM.Higanbana;
+                        if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA))
+                            return 0;
+                        if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU))
+                            return 0;
+                        if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU))
+                            return 0;
+                        if (clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.KA) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.GETSU) && clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU))
+                            return 0;
+                        if (clientState.JobGauges.Get<SAMGauge>().Kenki >= 20 && level >= 52)
+                        {
+                            if (!buffArray.SearchPlayer(1229, clientState))
+                                return SAM.HissatsuKaiten;
                         }
+                        if (level >= 30)
+                            return SAM.Higanbana;
                     }
                 }
             }
@@ -433,12 +485,20 @@ namespace XIVComboPlugin.JobActions
         }
         private uint Setsu_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
+            var buffArray = new BuffArray();
             if (!clientState.JobGauges.Get<SAMGauge>().Sen.HasFlag(Sen.SETSU) && level >= 50)
             {
-                if (comboTime > 0)
+                if (!buffArray.SearchPlayer(1299, clientState, 0, 15))
                 {
-                    if (lastMove == SAM.Hakaze && level >= 4)
-                        return SAM.Yukikaze;
+                    return 0;
+                }
+                else
+                {
+                    if (comboTime > 0)
+                    {
+                        if (lastMove == SAM.Hakaze && level >= 4)
+                            return SAM.Yukikaze;
+                    }
                 }
             }
             return 0;
