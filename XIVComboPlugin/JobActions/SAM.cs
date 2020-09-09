@@ -6,6 +6,8 @@ using Dalamud.Plugin;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using ImGuiNET;
+using Dalamud.Game.ClientState.Actors;
+using System.Runtime.InteropServices;
 
 namespace XIVComboPlugin.JobActions
 {
@@ -34,13 +36,37 @@ namespace XIVComboPlugin.JobActions
             HissatsuGyoten = 7492,
             HissatsuYaten = 7493,
             MeikyoShisui = 7499,
+            Ikishoten = 16482,
+            HissatsuSenei = 16481,
             HissatsuKaiten = 7494;
 
         public static bool
+            ComboInitialized,
+            Ikishoten_Cooldown,
+            HissatsuSenei_Cooldown,
             MeikyoShisui_Cooldown;
 
-        public static DateTime 
+        public static DateTime
+            Ikishoten_CooldownTime,
+            HissatsuSenei_CooldownTime,
             MeikyoShisui_CooldownTime;
+
+        public static Action
+            MercifulEyesAction,
+            OkaAction,
+            MangetsuAction,
+            HissatsuGyotenAction,
+            HissatsuYatenAction,
+            YukikazeAction;
+
+        public static SAMcombo
+            MercifulEyesCombo,
+            OkaCombo,
+            MangetsuCombo,
+            HissatsuGyotenCombo,
+            HissatsuYatenCombo,
+            YukikazeCombo;
+
 
     }
 
@@ -184,10 +210,12 @@ namespace XIVComboPlugin.JobActions
         // EXTRA Combos and Conditionals for Personal Use
         public uint[] Single_Combo(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
-            return new uint[]
-            {
-                MeikyoShisui_Conditional(clientState, comboTime, lastMove, level),
+                return new uint[]
+                {
+                MeikyoShisui_Conditional(clientState, SAM.YukikazeAction, comboTime, lastMove, level),
                 Seigan_Conditional(clientState, comboTime, lastMove, level),
+                Ikishoten_Conditional(clientState, SAM.YukikazeAction, comboTime, lastMove, level),
+                Senei_Conditional(clientState, SAM.YukikazeAction, comboTime, lastMove, level),
                 HissatsuShinten_Conditional(clientState, comboTime, lastMove, level),
                 MidareSetsugekka_Conditional(clientState, comboTime, lastMove, level),
                 Higanbana_Conditional(clientState, comboTime, lastMove, level),
@@ -200,12 +228,13 @@ namespace XIVComboPlugin.JobActions
                 Jinpu_Conditional(clientState, comboTime, lastMove, level),
                 Yukikaze_Conditional(clientState, comboTime, lastMove, level),
                 SAM.Hakaze
-            };
+                };
         }
         public uint[] Aoe_Combo(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
             return new uint[] {
-                MeikyoShisuiAOE_Conditional(clientState, comboTime, lastMove, level),
+                MeikyoShisuiAOE_Conditional(clientState, SAM.MangetsuAction, comboTime, lastMove, level),
+                Ikishoten_Conditional(clientState, SAM.MangetsuAction, comboTime, lastMove, level),
                 HissatsuKyuten_Conditional(clientState, comboTime, lastMove, level),
                 TenkaGoken_Conditional(clientState, comboTime, lastMove, level),
                 KaAOE_Conditional(clientState, comboTime, lastMove, level),
@@ -270,24 +299,69 @@ namespace XIVComboPlugin.JobActions
             }
             return 0;
         }
-        private uint MeikyoShisui_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
+        private uint Senei_Conditional(ClientState clientState, Action action, float comboTime = 0, int lastMove = 0, int level = 0)
+        {
+            if (level >= 72)
+            {
+                if (action.Last() == SAM.HissatsuSenei)
+                {
+                    SAM.HissatsuSenei_CooldownTime = IconReplacer.currentTime;
+                    SAM.HissatsuSenei_Cooldown = true;
+                }
+                if (SAM.HissatsuSenei_Cooldown == false)
+                {
+                    if (clientState.JobGauges.Get<SAMGauge>().Kenki >= 50 && action.Current() == SAM.Ikishoten || clientState.JobGauges.Get<SAMGauge>().Kenki >= 50 && action.Current() == SAM.HissatsuSenei || clientState.JobGauges.Get<SAMGauge>().Kenki >= 50 && SAM.YukikazeAction.Current() == SAM.HissatsuShinten)
+                    {
+                        return SAM.HissatsuSenei;
+                    }
+                }
+                if (SAM.HissatsuSenei_Cooldown == true && IconReplacer.currentTime.Subtract(SAM.HissatsuSenei_CooldownTime).TotalMilliseconds > 120000)
+                {
+                    SAM.HissatsuSenei_Cooldown = false;
+                }
+            }
+            return 0;
+        }
+        private uint Ikishoten_Conditional(ClientState clientState, Action action, float comboTime = 0, int lastMove = 0, int level = 0)
         {
             var buffArray = new BuffArray();
-            if (IconReplacer.LastAction == SAM.MeikyoShisui)
+            if (level >= 68)
             {
-                SAM.MeikyoShisui_CooldownTime = DateTime.Now;
+                if (action.Last() == SAM.Ikishoten)
+                {
+                    SAM.Ikishoten_CooldownTime = IconReplacer.currentTime;
+                    SAM.Ikishoten_Cooldown = true;
+                }
+                if (SAM.Ikishoten_Cooldown == false)
+                {
+                    if (clientState.JobGauges.Get<SAMGauge>().Kenki < 50 && action.Last() == SAM.HissatsuKaiten || clientState.JobGauges.Get<SAMGauge>().Kenki < 50 && action.Current() == SAM.Ikishoten)
+                        return SAM.Ikishoten;
+                }
+                if (SAM.Ikishoten_Cooldown == true && IconReplacer.currentTime.Subtract(SAM.Ikishoten_CooldownTime).TotalMilliseconds > 60000)
+                {
+                    SAM.Ikishoten_Cooldown = false;
+                }
+            }
+            return 0;
+        }
+        private uint MeikyoShisui_Conditional(ClientState clientState, Action action, float comboTime = 0, int lastMove = 0, int level = 0)
+        {
+            var buffArray = new BuffArray();
+            if (action.Last() == SAM.MeikyoShisui)
+            {
+                SAM.MeikyoShisui_CooldownTime = IconReplacer.currentTime;
                 SAM.MeikyoShisui_Cooldown = true;
             }
             if (SAM.MeikyoShisui_Cooldown == false)
             {
                 if (buffArray.SearchPlayer(1298, clientState, 0, 10) && buffArray.SearchPlayer(1299, clientState, 0, 10) && buffArray.SearchTarget(1228, clientState, 0, 15))
                 {
-                    if (!buffArray.SearchPlayer(1233, clientState) && IconReplacer.CurrentAction == SAM.Hakaze || !buffArray.SearchPlayer(1233, clientState) && IconReplacer.CurrentAction == SAM.MeikyoShisui)
+                    if (!buffArray.SearchPlayer(1233, clientState) && action.Current() == SAM.Hakaze || !buffArray.SearchPlayer(1233, clientState) && action.Current() == SAM.MeikyoShisui)
 
                         return SAM.MeikyoShisui;
                 }
             }
-            if (SAM.MeikyoShisui_Cooldown == true && DateTime.Now.Subtract(SAM.MeikyoShisui_CooldownTime).TotalMilliseconds > 55000)
+            if (SAM.MeikyoShisui_Cooldown == true && IconReplacer.currentTime.Subtract(SAM.MeikyoShisui_CooldownTime).TotalMilliseconds > 55000)
             {
                 SAM.MeikyoShisui_Cooldown = false;
             }
@@ -311,20 +385,20 @@ namespace XIVComboPlugin.JobActions
             }
             return 0;
         }
-        private uint MeikyoShisuiAOE_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
+        private uint MeikyoShisuiAOE_Conditional(ClientState clientState, Action action, float comboTime = 0, int lastMove = 0, int level = 0)
         {
             var buffArray = new BuffArray();
-            if (IconReplacer.LastAction == SAM.MeikyoShisui)
+            if (action.Last() == SAM.MeikyoShisui)
             {
-                SAM.MeikyoShisui_CooldownTime = DateTime.Now;
+                SAM.MeikyoShisui_CooldownTime = IconReplacer.currentTime;
                 SAM.MeikyoShisui_Cooldown = true;
             }
             if (SAM.MeikyoShisui_Cooldown == false)
             {
-                    if (!buffArray.SearchPlayer(1233, clientState) && IconReplacer.CurrentAction == SAM.Fuga || !buffArray.SearchPlayer(1233, clientState) && IconReplacer.CurrentAction == SAM.MeikyoShisui)
-                        return SAM.MeikyoShisui;
+                if (!buffArray.SearchPlayer(1233, clientState) && action.Current() == SAM.Fuga || !buffArray.SearchPlayer(1233, clientState) && action.Current() == SAM.MeikyoShisui)
+                    return SAM.MeikyoShisui;
             }
-            if (SAM.MeikyoShisui_Cooldown == true && DateTime.Now.Subtract(SAM.MeikyoShisui_CooldownTime).TotalMilliseconds > 55000)
+            if (SAM.MeikyoShisui_Cooldown == true && IconReplacer.currentTime.Subtract(SAM.MeikyoShisui_CooldownTime).TotalMilliseconds > 55000)
             {
                 SAM.MeikyoShisui_Cooldown = false;
             }
@@ -387,7 +461,7 @@ namespace XIVComboPlugin.JobActions
             return 0;
         }
         private uint HissatsuShinten_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
-        {    
+        {
             if (clientState.JobGauges.Get<SAMGauge>().Kenki > 40 && level >= 62)
             {
                 return SAM.HissatsuShinten;
@@ -504,5 +578,20 @@ namespace XIVComboPlugin.JobActions
             return 0;
         }
 
+        public void IntSkills()
+        {
+            SAM.YukikazeCombo = new SAMcombo();
+            SAM.YukikazeAction = new Action();
+            SAM.HissatsuYatenCombo = new SAMcombo();
+            SAM.HissatsuYatenAction = new Action();
+            SAM.HissatsuGyotenCombo = new SAMcombo();
+            SAM.HissatsuGyotenAction = new Action();
+            SAM.MangetsuCombo = new SAMcombo();
+            SAM.MangetsuAction = new Action();
+            SAM.OkaCombo = new SAMcombo();
+            SAM.OkaAction = new Action();
+            SAM.MercifulEyesCombo = new SAMcombo();
+            SAM.MercifulEyesAction = new Action();
+        }
     }
 }

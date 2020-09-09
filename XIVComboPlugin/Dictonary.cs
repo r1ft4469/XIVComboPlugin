@@ -30,7 +30,11 @@ namespace XIVComboPlugin.ActionDictionary
                 7493,
                 7494,
                 7499,
-                16162,
+                16481,
+                16144,
+                16153,
+                16138,
+                16159,
                 ///
                 16477,
                 88,

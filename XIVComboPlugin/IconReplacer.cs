@@ -47,13 +47,10 @@ namespace XIVComboPlugin
 
         private unsafe delegate int* getArray(long* address);
 
-        public static uint
-            LastAction,
-            CurrentAction;
-
         private bool shutdown;
 
-        public static Stack<uint> ActionStack;
+        public static DateTime
+            currentTime;
 
         public IconReplacer(SigScanner scanner, ClientState clientState, XIVComboConfiguration configuration)
         {
@@ -77,12 +74,6 @@ namespace XIVComboPlugin
             vanillaIds = new HashSet<uint>();
             noUpdateIcons = new HashSet<uint>();
             seenNoUpdate = new HashSet<uint>();
-
-            LastAction = 0;
-            CurrentAction = 0;
-            ActionStack = new Stack<uint>();
-            ActionStack.Push(0);
-            ActionStack.Push(0);
 
 
             PopulateDict();
@@ -171,11 +162,7 @@ namespace XIVComboPlugin
         /// </summary>
         private ulong GetIconDetour(byte self, uint actionID)
         {
-            if (CurrentAction == SAM.MeikyoShisui)
-            {
-                PluginLog.Log("Current = " + CurrentAction.ToString());
-                PluginLog.Log("Last = " + LastAction.ToString());
-            }
+            currentTime = DateTime.Now;
             if (clientState.LocalPlayer == null) return iconHook.Original(self, actionID);
             var job = clientState.LocalPlayer.ClassJob.Id;
             if (lastJob != job)
@@ -200,370 +187,58 @@ namespace XIVComboPlugin
             //var level = Marshal.ReadByte(playerLevel);
             var level = clientState.LocalPlayer.Level;
 
-            // Still spaghetti Need to make a Array for Jobs and Pull Flags based on Job ID
-
-            // ASTROLOGIAN
-            if (job == 33)
+            // Made a Switch
+            switch (job)
             {
-                // Make cards on the same button as play
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.AstrologianCardsOnDrawFeature))
-                    if (actionID == AST.Play)
+                // SAMURAI
+                case 34:
                     {
-                        ASTcombo combo = new ASTcombo();
-                        foreach (uint a in combo.Play_Combo(clientState, comboTime, lastMove, level))
+                        if (SAM.ComboInitialized == false)
                         {
-                            if (a != 0)
-                                return a;
+                            new SAMcombo().IntSkills();
+                            SAM.ComboInitialized = true;
                         }
+                        // Replaced for Personal Use with Single Target
+                        // Replace Yukikaze with Yukikaze combo
+                        if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiYukikazeCombo) && actionID == SAM.Yukikaze)
+                            return SAM.YukikazeAction.Parse(SAM.YukikazeCombo.Single_Combo(clientState, comboTime, lastMove, level), actionID);
+                        // Replace Gekko with Gekko combo
+                        if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiGekkoCombo) && actionID == SAM.HissatsuYaten)
+                            return SAM.HissatsuYatenAction.Parse(SAM.HissatsuYatenCombo.Disenguage_Combo(clientState, comboTime, lastMove, level), actionID);
+                        // Replace Kasha with Kasha combo
+                        if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiKashaCombo) && actionID == SAM.HissatsuGyoten)
+                            return SAM.HissatsuGyotenAction.Parse(SAM.HissatsuGyotenCombo.Enguage_Combo(clientState, comboTime, lastMove, level), actionID);
+                        // Replaced for Personal Use with AOE
+                        // Replace Mangetsu with Mangetsu combo
+                        if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiMangetsuCombo) && actionID == SAM.Mangetsu)
+                            return SAM.MangetsuAction.Parse(SAM.MangetsuCombo.Aoe_Combo(clientState, comboTime, lastMove, level), actionID);
+                        // Replace Oka with Oka combo
+                        if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiOkaCombo) && actionID == SAM.Oka)
+                            return SAM.OkaAction.Parse(SAM.OkaCombo.Oka_Combo(clientState, comboTime, lastMove, level), actionID);
+                        // Turn Seigan into Third Eye when not procced
+                        if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiThirdEyeFeature) && actionID == SAM.MercifulEyes)
+                            return SAM.MercifulEyesAction.Parse(SAM.MercifulEyesCombo.MercifulEyes_Combo(clientState, comboTime, lastMove, level), actionID);
+                        return iconHook.Original(self, actionID);
                     }
+                // GUNBREAKER WIP
+                case 37:
+                    {
+                        if (GNB.ComboInitialized == false)
+                        {
+                            new GNBcombo().IntSkills();
+                            GNB.ComboInitialized = true;
+                        }
+                        if (Configuration.ComboPresets.HasFlag(CustomComboPreset.GunbreakerSolidBarrelCombo) && actionID == GNB.SolidBarrel)
+                            return GNB.SolidBarrelAction.Parse(GNB.SolidBarrelCombo.ST_Combo(clientState, comboTime, lastMove, level), actionID);
+                        if (Configuration.ComboPresets.HasFlag(CustomComboPreset.GunbreakerDemonSlaughterCombo) && actionID == GNB.DemonSlaughter)
+                            return GNB.DemonSlaughterAction.Parse(GNB.DemonSlaughterlCombo.AOE_Combo(clientState, comboTime, lastMove, level), actionID);
+                        if (Configuration.ComboPresets.HasFlag(CustomComboPreset.GunbreakerGnashingFangCombo) && actionID == GNB.WickedTalon)
+                            return GNB.WickedTalonAction.Parse(GNB.DemonSlaughterlCombo.WickedTalon_Combo(clientState, comboTime, lastMove, level), actionID);
+                        return iconHook.Original(self, actionID);
+                    }
+                default:
+                    return iconHook.Original(self, actionID);
             }
-
-            // BLACK MAGE
-            if (job == 25)
-            {
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.BlackEnochianFeature))
-                    if (actionID == BLM.Enochian)
-                    {
-                        BLMcombo combo = new BLMcombo();
-                        foreach (uint a in combo.Enochian_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-
-                // Umbral Soul and Transpose
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.BlackManaFeature))
-                    if (actionID == BLM.Transpose)
-                    {
-                        BLMcombo combo = new BLMcombo();
-                        foreach (uint a in combo.Transpose_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-
-                // Ley Lines and BTL
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.BlackLeyLines))
-                    if (actionID == BLM.LeyLines)
-                    {
-                        BLMcombo combo = new BLMcombo();
-                        foreach (uint a in combo.LeyLines_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-            }
-
-            // BARD
-            if (job == 23)
-            {
-                // Replace Wanderer's Minuet with PP when in WM.
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.BardWandererPPFeature))
-                    if (actionID == BRD.WanderersMinuet)
-                    {
-                        BRDcombo combo = new BRDcombo();
-                        foreach (uint a in combo.WanderersMinuet_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-
-                // Replace HS/BS with SS/RA when procced.
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.BardStraightShotUpgradeFeature))
-                    if (actionID == BRD.HeavyShot || actionID == BRD.BurstShot)
-                    {
-                        BRDcombo combo = new BRDcombo();
-                        foreach (uint a in combo.HeavyShot_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-
-            }
-
-            // DANCER
-            if (job == 38)
-            {
-                // AoE GCDs are split into two buttons, because priority matters
-                // differently in different single-target moments. Thanks yoship.
-                // Replaces each GCD with its procced version.
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.DancerAoeGcdFeature))
-                {
-                    if (actionID == DNC.Bloodshower)
-                    {
-                        DNCcombo combo = new DNCcombo();
-                        foreach (uint a in combo.Bladeshower_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-
-                    if (actionID == DNC.RisingWindmill)
-                    {
-                        DNCcombo combo = new DNCcombo();
-                        foreach (uint a in combo.Windmill_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-                }
-
-                // Fan Dance changes into Fan Dance 3 while flourishing.
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.DancerFanDanceCombo))
-                {
-                    if (actionID == DNC.FanDance1)
-                    {
-                        DNCcombo combo = new DNCcombo();
-                        foreach (uint a in combo.FanDance1_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-
-                    // Fan Dance 2 changes into Fan Dance 3 while flourishing.
-                    if (actionID == DNC.FanDance2)
-                    {
-                        DNCcombo combo = new DNCcombo();
-                        foreach (uint a in combo.FanDance2_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-                }
-            }
-
-            // DRAGOON
-            if (job == 22)
-            {
-                // Change Jump/High Jump into Mirage Dive when Dive Ready
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.DragoonJumpFeature))
-                    if (actionID == DRG.Jump)
-                    {
-                        DRGcombo combo = new DRGcombo();
-                        foreach (uint a in combo.Jump_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-
-                // Change Blood of the Dragon into Stardiver when in Life of the Dragon
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.DragoonBOTDFeature))
-                    if (actionID == DRG.BOTD)
-                    {
-                        DRGcombo combo = new DRGcombo();
-                        foreach (uint a in combo.BOTD_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-
-                    }
-
-                // Replace Coerthan Torment with Coerthan Torment combo chain
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.DragoonCoerthanTormentCombo))
-                    if (actionID == DRG.CTorment)
-                    {
-                        DRGcombo combo = new DRGcombo();
-                        foreach (uint a in combo.DoomSpike_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-
-
-                // Replace Chaos Thrust with the Chaos Thrust combo chain
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.DragoonChaosThrustCombo))
-                    if (actionID == DRG.ChaosThrust)
-                    {
-                        DRGcombo combo = new DRGcombo();
-                        foreach (uint a in combo.ChaosThrust_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-
-                // Replace Full Thrust with the Full Thrust combo chain
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.DragoonFullThrustCombo))
-                    if (actionID == 84)
-                    {
-                        DRGcombo combo = new DRGcombo();
-                        foreach (uint a in combo.FullThrust_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-            }
-
-            //LEFT OFF ON DRK
-
-            // GUNBREAKER WIP
-            if (job == 37)
-            {
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.GunbreakerSolidBarrelCombo))
-                    if (actionID == GNB.SolidBarrel)
-                    {
-                        GNBcombo combo = new GNBcombo();
-                        foreach (uint a in combo.ST_Combo(clientState,comboTime, lastMove, level, actionID))
-                        {
-                            if (a != 0)
-                            {
-                                if (CurrentAction != a)
-                                {
-                                    CurrentAction = a;
-                                    ActionStack.Push(a);
-                                    if (ActionStack.Count > 2)
-                                    {
-                                        ActionStack.Pop();
-                                        LastAction = ActionStack.Pop();
-                                        ActionStack.Clear();
-                                        ActionStack.Push(LastAction);
-                                        ActionStack.Push(CurrentAction);
-                                    }
-                                }
-                                return a;
-                            }
-                        }
-                        //return actionID;
-                    }
-
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.GunbreakerGnashingFangCombo))
-                    if (actionID == GNB.WickedTalon)
-                    {
-                        GNBcombo combo = new GNBcombo();
-                        foreach (uint a in combo.WickedTalon_Combo(clientState, actionID, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                            {
-                                return a;
-                            }
-                        }
-                    }
-
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.GunbreakerDemonSlaughterCombo))
-                    if (actionID == GNB.DemonSlaughter)
-                    {
-                        GNBcombo combo = new GNBcombo();
-                        foreach (uint a in combo.DemonSlaughter_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                            {
-                                return a;
-                            }
-                        }
-                    }
-            }
-
-            // SAMURAI
-            if (job == 34)
-            {
-                // Replaced for Personal Use with Single Target
-                // Replace Yukikaze with Yukikaze combo
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiYukikazeCombo))
-                    if (actionID == SAM.Yukikaze)
-                    {
-                        return ActionParse(new SAMcombo().Single_Combo(clientState, comboTime, lastMove, level), actionID);
-                    }
-
-                // Replace Gekko with Gekko combo
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiGekkoCombo))
-                    if (actionID == SAM.HissatsuYaten)
-                    {
-                        SAMcombo combo = new SAMcombo();
-                        foreach (uint a in combo.Disenguage_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-
-                // Replace Kasha with Kasha combo
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiKashaCombo))
-                    if (actionID == SAM.HissatsuGyoten)
-                    {
-                        SAMcombo combo = new SAMcombo();
-                        foreach (uint a in combo.Enguage_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-
-                // Replaced for Personal Use with AOE
-                // Replace Mangetsu with Mangetsu combo
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiMangetsuCombo))
-                    if (actionID == SAM.Mangetsu)
-                    {
-                        SAMcombo combo = new SAMcombo();
-                        foreach (uint a in combo.Aoe_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-
-                // Replace Oka with Oka combo
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiOkaCombo))
-                    if (actionID == SAM.Oka)
-                    {
-                        SAMcombo combo = new SAMcombo();
-                        foreach (uint a in combo.Oka_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-
-                // Turn Seigan into Third Eye when not procced
-                if (Configuration.ComboPresets.HasFlag(CustomComboPreset.SamuraiThirdEyeFeature))
-                    if (actionID == SAM.MercifulEyes)
-                    {
-                        SAMcombo combo = new SAMcombo();
-                        foreach (uint a in combo.MercifulEyes_Combo(clientState, comboTime, lastMove, level))
-                        {
-                            if (a != 0)
-                                return a;
-                        }
-                    }
-            }
-
-            return iconHook.Original(self, actionID);
-        }
-
-        private uint ActionParse(uint[] ActionList, uint actionID)
-        {
-            foreach (uint a in ActionList)
-                if (a != 0)
-                {
-
-                    if (CurrentAction != a)
-                    {
-                        CurrentAction = a;
-                        ActionStack.Push(a);
-                        if (ActionStack.Count > 2)
-                        {
-                            ActionStack.Pop();
-                            LastAction = ActionStack.Pop();
-                            ActionStack.Clear();
-                            ActionStack.Push(LastAction);
-                            ActionStack.Push(CurrentAction);
-                        }
-                    }
-                    return a;
-                }
-            return actionID;
         }
         private void UpdateBuffAddress()
         {
@@ -585,7 +260,6 @@ namespace XIVComboPlugin
             var callback = Marshal.GetDelegateForFunctionPointer<getArray>(step3);
             return (IntPtr) callback((long*) num) + 8;
         }
-
         private void PopulateDict()
         {
             var dictionary = new ActionDictionary.Ids();
@@ -599,6 +273,43 @@ namespace XIVComboPlugin
             {
                 customIds.Add(customDictionary[i]);
             }
+        }
+    }
+
+    public class Action
+    {
+        private uint
+            CurrentAction,
+            LastAction;
+
+        private DateTime ActionTime;
+
+        public uint Parse(uint[] ActionList, uint actionID)
+        {
+            foreach (uint a in ActionList)
+                if (a != 0)
+                {
+                    if (CurrentAction != a)
+                    {
+                        LastAction = CurrentAction;
+                        ActionTime = IconReplacer.currentTime;
+                        CurrentAction = a;
+                    }
+                    return a;
+                }
+            return actionID;
+        }
+        public uint Last()
+        {
+            return LastAction;
+        }
+        public uint Current()
+        {
+            return CurrentAction;
+        }
+        public DateTime Time()
+        {
+            return ActionTime;
         }
     }
 }

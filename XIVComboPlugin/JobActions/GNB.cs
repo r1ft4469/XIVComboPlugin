@@ -24,6 +24,10 @@ namespace XIVComboPlugin.JobActions
             JugularRip = 16156,
             AbdomenTear = 16157,
             EyeGouge = 16158,
+            DangerZone = 16144,
+            SonicBreak = 16153,
+            NoMercy = 16138,
+            BowShock = 16159,
             BurstStrike = 16162;
 
 
@@ -34,13 +38,29 @@ namespace XIVComboPlugin.JobActions
         public const byte
             LevelContinuation = 70;
         public static bool
+            NoMercy_Cooldown,
+            SonicBreak_Cooldown,
+            DangerZone_Cooldown,
+            BowShock_Cooldown,
+            ComboInitialized,
             GnashingFang_Cooldown;
-        public static DateTime GnashingFang_CooldownTime;
-    }
+            
+        public static DateTime
+            NoMercy_CooldownTime,
+            SonicBreak_CooldownTime,
+            DangerZone_CooldownTime,
+            BowShock_CooldownTime,
+            GnashingFang_CooldownTime;
 
-    public static class Wi
-    {
-        
+        public static Action
+            DemonSlaughterAction,
+            WickedTalonAction,
+            SolidBarrelAction;
+
+        public static GNBcombo
+            DemonSlaughterlCombo,
+            WickedTalonCombo,
+            SolidBarrelCombo;
     }
 
     public class GNBcombo
@@ -52,7 +72,7 @@ namespace XIVComboPlugin.JobActions
                 GNB.KeenEdge
             };
         }
-        public uint[] WickedTalon_Combo(ClientState clientState, uint actionID, float comboTime = 0, int lastMove = 0, int level = 0)
+        public uint[] WickedTalon_Combo(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
             return new uint[] {
                 WickedTalon_Conditional(clientState, comboTime, lastMove, level),
@@ -69,7 +89,13 @@ namespace XIVComboPlugin.JobActions
         public uint[] ST_Combo(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0, uint actionID = 0)
         {
             return new uint[] {
-                Ammo_Conditional(clientState, comboTime, lastMove, level),
+                NoMercy_Conditional(clientState, GNB.SolidBarrelAction, comboTime, lastMove, level),
+                GnashingFang_Conditional(clientState, comboTime, lastMove, level),
+                SonicBreak_Conditional(clientState, comboTime, lastMove, level),
+                BowShock_Conditional(clientState, comboTime, lastMove, level),
+                DangerZone_Conditional(clientState, GNB.SolidBarrelAction, comboTime, lastMove, level),
+                WickedTalon_Conditional(clientState, comboTime, lastMove, level),
+                BurstStrike_Conditional(clientState, comboTime, lastMove, level),
                 SolidBarrel_Conditional(clientState, comboTime, lastMove, level),
                 GNB.KeenEdge
             };
@@ -77,13 +103,38 @@ namespace XIVComboPlugin.JobActions
         public uint[] AOE_Combo(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0, uint actionID = 0)
         {
             return new uint[] {
-                Ammo_Conditional(clientState, comboTime, lastMove, level),
-                SolidBarrel_Conditional(clientState, comboTime, lastMove, level),
-                GNB.KeenEdge
+                NoMercy_Conditional(clientState, GNB.DemonSlaughterAction, comboTime, lastMove, level),
+                BowShock_Conditional(clientState, comboTime, lastMove, level),
+                BurstStrike_Conditional(clientState, comboTime, lastMove, level),
+                DemonSlaughter_Conditional(clientState, comboTime, lastMove, level),
+                GNB.DemonSlice
             };
         }
 
-
+        private uint BowShock_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
+        {
+            var buffArray = new BuffArray();
+            if (level >= 62)
+            {
+                if (GNB.BowShock_Cooldown == false)
+                {
+                    if (!buffArray.SearchTarget(1838, clientState))
+                    {
+                        return GNB.BowShock;
+                    }
+                    else
+                    {
+                        GNB.BowShock_CooldownTime = IconReplacer.currentTime;
+                        GNB.BowShock_Cooldown = true;
+                    }
+                }
+                if (GNB.BowShock_Cooldown == true && IconReplacer.currentTime.Subtract(GNB.BowShock_CooldownTime).TotalMilliseconds > 58500)
+                {
+                    GNB.BowShock_Cooldown = false;
+                }
+            }
+            return 0;
+        }
         private uint DemonSlaughter_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
             if (comboTime > 0)
@@ -100,37 +151,104 @@ namespace XIVComboPlugin.JobActions
                     return GNB.SavageClaw;
                 case 2:
                     return GNB.WickedTalon;
-                default:
-                    return GNB.GnashingFang;
             }
+            return 0;
+        }
+        private uint SonicBreak_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
+        {
+            var buffArray = new BuffArray();
+            if (level >= 54)
+            {
+                if (GNB.SonicBreak_Cooldown == false)
+                {
+                    if (!buffArray.SearchTarget(1837, clientState))
+                    {
+                        return GNB.SonicBreak;
+                    }
+                    else
+                    {
+                        GNB.SonicBreak_CooldownTime = IconReplacer.currentTime;
+                        GNB.SonicBreak_Cooldown = true;
+                    }
+                }
+                if (GNB.SonicBreak_Cooldown == true && IconReplacer.currentTime.Subtract(GNB.SonicBreak_CooldownTime).TotalMilliseconds > 58500)
+                {
+                    GNB.SonicBreak_Cooldown = false;
+                }
+            }
+            return 0;
+        }
+        private uint DangerZone_Conditional(ClientState clientState, Action action, float comboTime = 0, int lastMove = 0, int level = 0)
+        {
+            if (level >= 18)
+            {
+                PluginLog.Log(action.Last().ToString());
+                if (action.Last() == GNB.DangerZone)
+                {
+                    GNB.DangerZone_CooldownTime = IconReplacer.currentTime;
+                    GNB.DangerZone_Cooldown = true;
+                }
+                if (GNB.DangerZone_Cooldown == false)
+                {
+                    if (IconReplacer.currentTime.Subtract(action.Time()).TotalMilliseconds < 1000)
+                        return GNB.DangerZone;
+                }
+                if (GNB.DangerZone_Cooldown == true && IconReplacer.currentTime.Subtract(GNB.DangerZone_CooldownTime).TotalMilliseconds > 30000)
+                {
+                    GNB.DangerZone_Cooldown = false;
+                }
+            }
+            return 0;
+        }
+        private uint NoMercy_Conditional(ClientState clientState, Action action, float comboTime = 0, int lastMove = 0, int level = 0)
+        {
+            var buffArray = new BuffArray();
+            if (action.Last() == GNB.NoMercy)
+            {
+                GNB.NoMercy_CooldownTime = IconReplacer.currentTime;
+                GNB.NoMercy_Cooldown = true;
+            }
+            if (level >= 2)
+            {
+                if (GNB.NoMercy_Cooldown == false)
+                {
+                    if (!buffArray.SearchPlayer(1831, clientState))
+                    {
+                        if (IconReplacer.currentTime.Subtract(action.Time()).TotalMilliseconds < 1000)
+                            return GNB.NoMercy;
+                    }
+                }
+                if (GNB.NoMercy_Cooldown == true && IconReplacer.currentTime.Subtract(GNB.NoMercy_CooldownTime).TotalMilliseconds > 60000)
+                {
+                    GNB.NoMercy_Cooldown = false;
+                }
+            }
+            return 0;
         }
 
-        private uint Ammo_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
+        private uint GnashingFang_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
             if (level >= 60)
             {
-                if (IconReplacer.LastAction == GNB.GnashingFang)
+                if (GNB.SolidBarrelAction.Last() == GNB.GnashingFang)
                 {
-                    GNB.GnashingFang_CooldownTime = DateTime.Now;
+                    GNB.GnashingFang_CooldownTime = IconReplacer.currentTime;
                     GNB.GnashingFang_Cooldown = true;
                 }
                 if (clientState.JobGauges.Get<GNBGauge>().NumAmmo > 0 && GNB.GnashingFang_Cooldown == false)
                 {
                     return GNB.GnashingFang;
                 }
-                if (GNB.GnashingFang_Cooldown == true && DateTime.Now.Subtract(GNB.GnashingFang_CooldownTime).TotalMilliseconds > 30000)
+                if (GNB.GnashingFang_Cooldown == true && IconReplacer.currentTime.Subtract(GNB.GnashingFang_CooldownTime).TotalMilliseconds > 30000)
                 {
                     GNB.GnashingFang_Cooldown = false;
                 }
-                var ammoComboState = clientState.JobGauges.Get<GNBGauge>().AmmoComboStepNumber;
-                switch (ammoComboState)
-                {
-                    case 1:
-                        return GNB.SavageClaw;
-                    case 2:
-                        return GNB.WickedTalon;
-                }
             }
+            return 0;
+        }
+
+        private uint BurstStrike_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
+        {
             if (level >= 30)
             {
                 if (clientState.JobGauges.Get<GNBGauge>().NumAmmo > 0)
@@ -140,6 +258,7 @@ namespace XIVComboPlugin.JobActions
             }
             return 0;
         }
+
         private uint SolidBarrel_Conditional(ClientState clientState, float comboTime = 0, int lastMove = 0, int level = 0)
         {
             if (comboTime > 0)
@@ -150,6 +269,16 @@ namespace XIVComboPlugin.JobActions
                     return GNB.SolidBarrel;
             }
             return 0;
+        }
+
+        public void IntSkills()
+        {
+            GNB.SolidBarrelCombo = new GNBcombo();
+            GNB.SolidBarrelAction = new Action();
+            GNB.DemonSlaughterlCombo = new GNBcombo();
+            GNB.DemonSlaughterAction = new Action();
+            GNB.WickedTalonCombo = new GNBcombo();
+            GNB.WickedTalonAction = new Action();
         }
     }
 }
